@@ -4,7 +4,7 @@ from datetime import datetime
 
 class FuncionarioCreate(BaseModel):
     nome: str = Field(..., min_length=1, max_length=100)
-    email: str = Field(..., regex=r'^[\w\.-]+@[\w\.-]+\.\w+$')
+    email: str = Field(..., pattern=r"^[\w\.-]+@[\w\.-]+\.\w+$")
     senha: str = Field(..., min_length=6)
     cargo: str = Field(default="colaborador", max_length=50)
     
