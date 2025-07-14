@@ -10,8 +10,7 @@ logger = get_logger()
 
 async def criar_funcionario(data: FuncionarioCreate, db: AsyncSession) -> Funcionario:
     """
-    Cria um novo funcionário no banco de dados.
-    Aplica validações, logging estruturado e tratamento de erros conforme boas práticas.
+    Cria um novo funcionário no bd
     """
     endpoint = "POST /funcionarios"
     # Loga tentativa de cadastro

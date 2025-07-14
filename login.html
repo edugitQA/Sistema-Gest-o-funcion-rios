@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Teste de Login - Funcionários</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f5f5f5; }
+        .container { max-width: 350px; margin: 60px auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 8px #ccc; }
+        input, button { width: 100%; margin: 10px 0; padding: 10px; }
+        .token { word-break: break-all; background: #eee; padding: 8px; border-radius: 4px; }
+        .success { color: green; margin-top: 10px; }
+        .error { color: red; margin-top: 10px; }
+        .tab-btn { width: 49%; display: inline-block; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button class="tab-btn" onclick="showTab('login')">Login</button>
+        <button class="tab-btn" onclick="showTab('cadastro')">Cadastro</button>
+        <div id="loginTab">
+            <h2>Login Funcionário</h2>
+            <form id="loginForm">
+                <input type="email" id="email" placeholder="Email" required />
+                <input type="password" id="senha" placeholder="Senha" required />
+                <button type="submit">Entrar</button>
+            </form>
+            <div id="result"></div>
+        </div>
+        <div id="cadastroTab" style="display:none">
+            <h2>Cadastro Funcionário</h2>
+            <form id="cadastroForm">
+                <input type="text" id="nome_cad" placeholder="Nome" required minlength="1" maxlength="100" />
+                <input type="email" id="email_cad" placeholder="Email" required />
+                <input type="password" id="senha_cad" placeholder="Senha (mín. 6)" required minlength="6" />
+                <input type="text" id="cargo_cad" placeholder="Cargo" maxlength="50" value="colaborador" />
+                <button type="submit">Cadastrar</button>
+            </form>
+            <div id="cadastroResult"></div>
+        </div>
+    </div>
+    <script>
+        function showTab(tab) {
+            document.getElementById('loginTab').style.display = tab === 'login' ? '' : 'none';
+            document.getElementById('cadastroTab').style.display = tab === 'cadastro' ? '' : 'none';
+        }
+        // Login
+        document.getElementById('loginForm').onsubmit = async function(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const senha = document.getElementById('senha').value;
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '';
+            try {
+                const res = await fetch('http://localhost:8000/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, senha })
+                });
+                const data = await res.json();
+                if (res.ok && data.access_token) {
+                    resultDiv.innerHTML = `<div class='success'>Login realizado com sucesso!</div><b>Token:</b><div class='token'>${data.access_token}</div>`;
+                } else {
+                    resultDiv.innerHTML = `<div class='error'>${data.detail || 'Email ou senha incorretos.'}</div>`;
+                }
+            } catch (err) {
+                resultDiv.innerHTML = `<div class='error'>Erro de conexão com a API.</div>`;
+            }
+        }
+        // Cadastro
+        document.getElementById('cadastroForm').onsubmit = async function(e) {
+            e.preventDefault();
+            const nome = document.getElementById('nome_cad').value.trim();
+            const email = document.getElementById('email_cad').value.trim();
+            const senha = document.getElementById('senha_cad').value;
+            const cargo = document.getElementById('cargo_cad').value.trim() || 'colaborador';
+            const resultDiv = document.getElementById('cadastroResult');
+            resultDiv.innerHTML = '';
+            // Validações front-end
+            if (!nome || nome.length > 100) {
+                resultDiv.innerHTML = `<div class='error'>Nome obrigatório (1-100 caracteres).</div>`; return;
+            }
+            if (!email.match(/^[\w\.-]+@[\w\.-]+\.\w+$/)) {
+                resultDiv.innerHTML = `<div class='error'>Email inválido.</div>`; return;
+            }
+            if (!senha || senha.length < 6) {
+                resultDiv.innerHTML = `<div class='error'>Senha deve ter pelo menos 6 caracteres.</div>`; return;
+            }
+            if (cargo.length > 50) {
+                resultDiv.innerHTML = `<div class='error'>Cargo deve ter até 50 caracteres.</div>`; return;
+            }
+            try {
+                const res = await fetch('http://localhost:8000/funcionarios/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nome, email, senha, cargo })
+                });
+                const data = await res.json();
+                if (res.ok && data.id) {
+                    resultDiv.innerHTML = `<div class='success'>Cadastro realizado com sucesso!</div>`;
+                } else {
+                    resultDiv.innerHTML = `<div class='error'>${data.detail || 'Erro ao cadastrar.'}</div>`;
+                }
+            } catch (err) {
+                resultDiv.innerHTML = `<div class='error'>Erro de conexão com a API.</div>`;
+            }
+        }
+    </script>
+</body>
+</html>
