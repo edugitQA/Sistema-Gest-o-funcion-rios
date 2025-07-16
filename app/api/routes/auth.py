@@ -1,5 +1,5 @@
 from app.services.auth_service import autenticar_funcionario
-from app.schemas.auth import LoginData, TokenResponse
+from app.domain.schemas.auth import LoginData, TokenResponse
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.session import get_session

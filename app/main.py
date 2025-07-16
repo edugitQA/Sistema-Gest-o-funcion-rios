@@ -1,7 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api import routes_funcionario
-from app.api import routes_auth, routes_funcionario, routes_protegidas
+from app.api.routes import funcionario, auth, protegidas
 
 app = FastAPI(
     title="API ONLINE",
@@ -18,9 +17,9 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
-app.include_router(routes_funcionario.router)
-app.include_router(routes_auth.router)
-app.include_router(routes_protegidas.router)
+app.include_router(funcionario.router)
+app.include_router(auth.router)
+app.include_router(protegidas.router)
 
 @app.get("/")
 async def root():

@@ -1,5 +1,5 @@
 from app.repositories.funcionario_repository import FuncionarioRepository
-from app.schemas.funcionario import FuncionarioCreate, FuncionarioResponse
+from app.domain.schemas.funcionario import FuncionarioCreate, FuncionarioResponse
 from app.services.funcionario_service import criar_funcionario
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
