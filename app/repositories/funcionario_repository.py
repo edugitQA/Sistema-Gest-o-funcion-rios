@@ -1,6 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from app.models.funcionario import Funcionario
+from app.domain.models.funcionario import Funcionario
 
 class FuncionarioRepository:
     """Repository para acesso a dados de Funcionário."""
