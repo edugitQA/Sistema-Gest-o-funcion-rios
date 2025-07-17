@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.routes import funcionario, auth, protegidas
 
 app = FastAPI(
-    title="API ONLINE",
+    title="Gestão de Funcionários API",
     description="API CRUD funcionários",
     version="1.0.0"
 )
