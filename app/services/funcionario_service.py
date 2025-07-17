@@ -5,12 +5,14 @@ from app.utils.security import hash_senha
 from app.utils.logger import get_logger, log_event
 from app.repositories.funcionario_repository import FuncionarioRepository
 from sqlalchemy.ext.asyncio import AsyncSession
+from app.domain.schemas.funcionario import FuncionarioUpdate # Adicionar
+from uuid import UUID
 
 logger = get_logger()
 
 async def criar_funcionario(data: FuncionarioCreate, db: AsyncSession) -> Funcionario:
     """
-    Cria um novo funcionário no banco de dados, validando unicidade de email e nome.
+    Cria um novo funcionário no banco, validar unicidade de email e nome.
     """
     endpoint = "POST /funcionarios"
     log_event(logger, endpoint, "INICIADO", "Tentativa de cadastro", email=data.email, nome=data.nome)
@@ -55,3 +57,25 @@ async def criar_funcionario(data: FuncionarioCreate, db: AsyncSession) -> Funcio
         timestamp=str(novo.data_criacao)
     )
     return novo
+
+async def listar_todos_funcionarios(db: AsyncSession):
+    return await FuncionarioRepository.get_all(db)
+
+async def atualizar_funcionario(funcionario_id: UUID, data: FuncionarioUpdate, db: AsyncSession):
+    funcionario = await FuncionarioRepository.get_by_id(db, funcionario_id)
+    if not funcionario:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Funcionário não encontrado.")
+
+    update_data = data.model_dump(exclude_unset=True)
+    for key, value in update_data.items():
+        setattr(funcionario, key, value)
+
+    await db.commit()
+    await db.refresh(funcionario)
+    return funcionario
+
+async def deletar_funcionario(funcionario_id: UUID, db: AsyncSession):
+    funcionario = await FuncionarioRepository.get_by_id(db, funcionario_id)
+    if not funcionario:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Funcionário não encontrado.")
+    await FuncionarioRepository.delete(db, funcionario)
